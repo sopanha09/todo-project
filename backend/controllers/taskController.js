@@ -9,6 +9,12 @@ const getTasks = (req, res) => {
 // @route POST /api/tasks
 // @access public
 const createTask = (req, res) => {
+  console.log(req.body);
+  const { title, priority, column } = req.body;
+  if (!title || !priority || !column) {
+    res.status(400);
+    throw new Error('Please add all fields');
+  }
   res.status(201).json({ message: 'Create task' });
 };
 
