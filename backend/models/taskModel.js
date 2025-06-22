@@ -16,6 +16,11 @@ const taskSchema = mongoose.Schema(
       type: String,
       maxlength: 1000,
     },
+    column_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, 'Column ID is required'],
+      ref: 'Column',
+    },
     priority: {
       type: String,
       enum: ['Low', 'Medium', 'High'],

@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const Column = require('../models/columnModel');
 
 // @desc Register a user
 // @route POST /api/users/register
@@ -27,8 +28,12 @@ const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
   });
 
-  console.log('User created:', user);
   if (user) {
+    await Column.insertMany([
+      { title: 'To Do', color: '#FF5733', order: 0, user_id: user._id },
+      { title: 'In Progress', color: '#33C1FF', order: 1, user_id: user._id },
+      { title: 'Done', color: '#75FF33', order: 2, user_id: user._id },
+    ]);
     res.status(201).json({
       _id: user.id,
       username: user.username,
@@ -38,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Invalid user data');
   }
-  res.status(201).json({ message: 'User registered successfully' });
+  // res.status(201).json({ message: 'User registered successfully' });
 });
 
 // @desc Login a user

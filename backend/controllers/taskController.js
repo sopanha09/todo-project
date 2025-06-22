@@ -5,7 +5,7 @@ const Task = require('../models/taskModel');
 // @route GET /api/tasks
 // @access private
 const getTasks = asyncHandler(async (req, res) => {
-  const tasks = await Task.find({ user_id: req.user.id });
+  const tasks = await Task.find({ user_id: req.user.id }).populate('column_id');
   res.status(200).json(tasks);
 });
 
@@ -14,8 +14,8 @@ const getTasks = asyncHandler(async (req, res) => {
 // @access private
 const createTask = asyncHandler(async (req, res) => {
   console.log(req.body);
-  const { title, description, dueDate, priority } = req.body;
-  if (!title || !priority) {
+  const { title, description, dueDate, column_id, priority } = req.body;
+  if (!title || !priority || !column_id) {
     res.status(400);
     throw new Error('Please add all fields');
   }
@@ -23,18 +23,20 @@ const createTask = asyncHandler(async (req, res) => {
   const task = await Task.create({
     title,
     description,
-    dueDate: req.body.dueDate || null,
+    dueDate: dueDate || null,
+    column_id,
     priority,
     user_id: req.user.id,
   });
-  res.status(201).json(task);
+  const populatedTask = await Task.findById(task._id).populate('column_id');
+  res.status(201).json(populatedTask);
 });
 
 // @desc Get all tasks
 // @route GET /api/tasks/:id
 // @access private
 const getTask = asyncHandler(async (req, res) => {
-  const task = await Task.findById(req.params.id);
+  const task = await Task.findById(req.params.id).populate('column_id');
   if (!task) {
     res.status(404);
     throw new Error('Task not found');
@@ -59,7 +61,7 @@ const updateTask = asyncHandler(async (req, res) => {
 
   const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-  });
+  }).populate('column_id');
   res.status(200).json(updatedTask);
 });
 
