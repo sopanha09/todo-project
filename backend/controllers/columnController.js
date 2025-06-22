@@ -5,7 +5,9 @@ const Column = require('../models/columnModel');
 // @route GET /api/columns
 // @access private
 const getColumns = asyncHandler(async (req, res) => {
-  const columns = await Column.find({ user_id: req.user.id }).sort('order');
+  const columns = await Column.find({ user_id: req.user.id }).sort({
+    order: 1,
+  });
   res.status(200).json(columns);
 });
 
