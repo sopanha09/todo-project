@@ -1,9 +1,13 @@
-import React, { use, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Banner from '@/components/Banner';
 import Board from '@/components/Board';
 import TaskForm from '@/components/TaskForm';
 import ColumnManager from '@/components/ColumnManager';
+import { fetchColumns } from '@/services/api';
+import toast from 'react-hot-toast';
+
+const token = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
 
 const initialColumns = [
   { id: 'todo', title: 'To Do', color: '#FF5733' },
@@ -11,14 +15,39 @@ const initialColumns = [
   { id: 'done', title: 'Done', color: '#75FF33' },
 ];
 
+const API_URL = 'http://localhost:8000/api';
+
 const HomePage = () => {
   const [viewMode, setViewMode] = useState('board');
-  // const [columns] = useState(initialColumns);
   const [tasks, setTasks] = useState([]);
   const [openTaskForm, setOpenTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [openColumnManager, setOpenColumnManager] = useState(false);
   const [columns, setColumns] = useState(initialColumns);
+  const [loadingColumns, setLoadingColumns] = useState(true);
+  const [columnsError, setColumnsError] = useState(null);
+
+  useEffect(() => {
+    const getColumns = async () => {
+      setLoadingColumns(true);
+      try {
+        const res = await fetchColumns({
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setColumns(res.data);
+        setColumnsError(null);
+        console.log('Fetched columns:', res.data);
+      } catch (err) {
+        setColumns([]);
+        setColumnsError('Failed to load columns');
+        toast.error('Failed to load columns');
+        console.error('Fetch columns error:', err);
+      } finally {
+        setLoadingColumns(false);
+      }
+    };
+    getColumns();
+  }, []);
 
   const handleCreateColumn = (column) => {
     setColumns((prev) => [

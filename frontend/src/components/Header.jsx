@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, LayoutGrid, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { LogOut, LogIn, LayoutGrid, Menu } from 'lucide-react';
+import { getCurrentUser } from '@/services/api';
+import toast from 'react-hot-toast';
+
 const Header = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [greeting, setGreeting] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [timeout, setTimeout] = useState();
+  const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,6 +29,17 @@ const Header = () => {
       setGreeting('Good evening');
     }
   }, [currentTime]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      getCurrentUser(token)
+        .then((res) => setUserName(res.data.username || 'User'))
+        .catch(() => setUserName('User'));
+    } else {
+      setUserName('User');
+    }
+  }, []);
   return (
     <div className="max-w-full mx-auto px-6 py-8 flex flex-row items-center justify-between text-gray-700">
       <div className="flex items-center md:gap-5 gap-2">
@@ -35,20 +52,40 @@ const Header = () => {
           <div className="absolute top-1/2 -right-4 w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
         </div>
         <div className="flex flex-col">
-          <p className="md:text-xl text-lg font-medium">{greeting}, Sopanha!</p>
+          <p className="md:text-xl text-lg font-medium">
+            {greeting}, {userName}!
+          </p>
           <p className="text-indigo-600 text-sm">Let’s get it done today!</p>
         </div>
       </div>
-      <div className="flex flex-row items-center hover:text-indigo-600 justify-center gap-1  text-sm cursor-pointer hover:underline focus:underline">
-        <LogOut size={14} />
-        <span className="md:flex hidden">Sign out</span>
-      </div>
-      {/* <button
-        className="p-3 shadow bg-white rounded-xl text-gray-700"
-        onClick={() => setShowDropdown((prev) => !prev)}
-      >
-        <Menu />
-      </button> */}
+      {userName !== 'User' ? (
+        <div
+          onClick={() => {
+            toast('Signing out...');
+            setTimeout(() => {
+              localStorage.removeItem('accessToken');
+              navigate('/auth', { replace: true });
+            }, 400);
+          }}
+          className="flex flex-row items-center hover:text-indigo-600 justify-center gap-1 text-sm cursor-pointer hover:underline focus:underline"
+        >
+          <LogOut size={14} />
+          <span className="md:flex hidden">Sign out</span>
+        </div>
+      ) : (
+        <div
+          onClick={() => {
+            toast('Signing in...');
+            setTimeout(() => {
+              navigate('/auth', { replace: true });
+            }, 400);
+          }}
+          className="flex flex-row items-center hover:text-indigo-600 justify-center gap-1 text-sm cursor-pointer hover:underline focus:underline"
+        >
+          <LogIn size={14} />
+          <span className="md:flex hidden">Sign in</span>
+        </div>
+      )}
     </div>
   );
 };

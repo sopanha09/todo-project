@@ -1,0 +1,128 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { registerUser, loginUser } from '@/services/api';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import toast from 'react-hot-toast';
+
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [timeout, setTimeout] = useState();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (isLogin) {
+        const res = await loginUser({
+          email: form.email,
+          password: form.password,
+        });
+        localStorage.setItem('accessToken', res.data.accessToken);
+        toast.success('Login successful!');
+        navigate('/');
+      } else {
+        await registerUser(form);
+        toast.success('Registration successful! Please log in.');
+        navigate('/');
+      }
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          (isLogin ? 'Login failed' : 'Registration failed')
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-sm">
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <h2 className="text-2xl font-bold text-center mb-2">
+              {isLogin ? 'Sign In' : 'Register'}
+            </h2>
+            {!isLogin && (
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  required
+                  autoComplete="username"
+                />
+              </div>
+            )}
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+              disabled={loading}
+              onClick={() => {
+                setTimeout(() => {
+                  navigate('/auth');
+                }, 400);
+              }}
+            >
+              {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Register'}
+            </Button>
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                className="text-indigo-600 text-sm"
+                onClick={() => setIsLogin((prev) => !prev)}
+              >
+                {isLogin
+                  ? "Don't have an account? Register"
+                  : 'Already have an account? Sign In'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default AuthPage;
