@@ -3,22 +3,46 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // Columns
-export const fetchColumns = () => axios.get(`${API_URL}/columns`);
-export const createColumn = (data, config) =>
-  axios.post(`${API_URL}/columns`, data, config);
-export const updateColumn = (id, data, config) =>
-  axios.put(`${API_URL}/columns/${id}`, data, config);
-export const deleteColumn = (id, config) =>
-  axios.delete(`${API_URL}/columns/${id}`, config);
+export const getColumns = (token) =>
+  axios.get(`${API_URL}/columns`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const createColumn = (data, token) =>
+  axios.post(`${API_URL}/columns`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const updateColumn = (id, data, token) =>
+  axios.put(`${API_URL}/columns/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const deleteColumn = (id, token) =>
+  axios.delete(`${API_URL}/columns/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
 // Tasks
-export const fetchTasks = () => axios.get(`${API_URL}/tasks`);
-export const createTask = (data, config) =>
-  axios.post(`${API_URL}/tasks`, data, config);
-export const updateTask = (id, data, config) =>
-  axios.put(`${API_URL}/tasks/${id}`, data, config);
-export const deleteTask = (id, config) =>
-  axios.delete(`${API_URL}/tasks/${id}`, config);
+export const getTasks = (token) =>
+  axios.get(`${API_URL}/tasks`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const createTask = (data, token) =>
+  axios.post(`${API_URL}/tasks`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const updateTask = (id, data, token) =>
+  axios.put(`${API_URL}/tasks/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const deleteTask = (id, token) =>
+  axios.delete(`${API_URL}/tasks/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
 // Users
 export const registerUser = (data) =>

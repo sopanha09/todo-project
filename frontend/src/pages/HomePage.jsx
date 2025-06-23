@@ -4,18 +4,20 @@ import Banner from '@/components/Banner';
 import Board from '@/components/Board';
 import TaskForm from '@/components/TaskForm';
 import ColumnManager from '@/components/ColumnManager';
-import { fetchColumns } from '@/services/api';
+import {
+  getColumns,
+  createColumn,
+  updateColumn,
+  deleteColumn,
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+} from '@/services/api';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 
-const token = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
-
-const initialColumns = [
-  { id: 'todo', title: 'To Do', color: '#FF5733' },
-  { id: 'doing', title: 'Doing', color: '#33C1FF' },
-  { id: 'done', title: 'Done', color: '#75FF33' },
-];
-
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const HomePage = () => {
   const [viewMode, setViewMode] = useState('board');
@@ -23,72 +25,109 @@ const HomePage = () => {
   const [openTaskForm, setOpenTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [openColumnManager, setOpenColumnManager] = useState(false);
-  const [columns, setColumns] = useState(initialColumns);
-  const [loadingColumns, setLoadingColumns] = useState(true);
-  const [columnsError, setColumnsError] = useState(null);
+  const [columns, setColumns] = useState([]);
+  const navigate = useNavigate();
+
+  const handleGetAllColumns = async () => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const res = await getColumns(token);
+      setColumns(res.data || []);
+      console.log('Columns fetched:', res.data);
+    } catch (err) {
+      console.error('Error fetching columns:', err);
+      setColumns([]);
+    }
+  };
+
+  const handleCreateColumn = async (column) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      navigate('/login');
+    }
+    try {
+      const res = await createColumn(column, token);
+      setColumns((prev) => [...prev, res.data]);
+      toast.success(`Column "${column.title}" created successfully!`);
+    } catch (err) {
+      console.error('Error creating column:', err);
+      toast.error('Failed to create column');
+    }
+  };
+
+  const handleUpdateColumn = async (columnId, data) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const res = await updateColumn(columnId, data, token);
+      setColumns((prev) =>
+        prev.map((col) => (col.id === columnId ? res.data : col))
+      );
+      toast.success(`Column "${data.title}" updated successfully!`);
+    } catch (err) {
+      console.error('Error updating column:', err);
+      toast.error('Failed to update column');
+    }
+  };
+  const handleDeleteColumn = async (columnId) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      await deleteColumn(columnId, token);
+      setColumns((prev) => prev.filter((col) => col.id !== columnId));
+      toast.success('Column deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting column:', err);
+      toast.error('Failed to delete column');
+    }
+  };
 
   useEffect(() => {
-    const getColumns = async () => {
-      setLoadingColumns(true);
+    const fetchTasks = async () => {
       try {
-        const res = await fetchColumns({
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setColumns(res.data);
-        setColumnsError(null);
-        console.log('Fetched columns:', res.data);
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          navigate('/auth');
+        }
+        console.log('Fetching tasks with token:', token);
+        const res = await getTasks(token);
+        setTasks(res.data || []);
       } catch (err) {
-        setColumns([]);
-        setColumnsError('Failed to load columns');
-        toast.error('Failed to load columns');
-        console.error('Fetch columns error:', err);
-      } finally {
-        setLoadingColumns(false);
+        setTasks([]);
       }
     };
-    getColumns();
-  }, []);
+    fetchTasks();
+  }, [navigate]);
 
-  const handleCreateColumn = (column) => {
-    setColumns((prev) => [
-      ...prev,
-      {
-        ...column,
-        id: `col-${Date.now()}`,
-        order: prev.length,
-      },
-    ]);
-  };
-
-  const handleUpdateColumn = (columnId, data) => {
-    setColumns((prev) =>
-      prev.map((col) => (col.id === columnId ? { ...col, ...data } : col))
-    );
-  };
-
-  const handleDeleteColumn = (columnId) => {
-    setColumns((prev) => prev.filter((col) => col.id !== columnId));
-  };
-
-  const handleAddOrEditTask = (task) => {
-    if (editingTask) {
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === editingTask.id ? { ...t, ...task, updatedAt: Date.now() } : t
-        )
-      );
-    } else {
-      setTasks((prev) => [
-        ...prev,
-        {
-          ...task,
-          id: `task-${Date.now()}`,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      ]);
+  const handleAddOrEditTask = async (task) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      if (editingTask) {
+        const res = await updateTask(editingTask.id, task, token);
+        setTasks((prev) =>
+          prev.map((t) => (t.id === editingTask.id ? res.data : t))
+        );
+        toast.success(`Task "${task.title}" updated successfully!`);
+      } else {
+        const res = await createTask(task, token);
+        setTasks((prev) => [...prev, res.data]);
+        toast.success(`Task "${task.title}" created successfully!`);
+      }
+    } catch (err) {
+      console.error('Error saving task:', err);
+      toast.error('Failed to save task');
     }
     setEditingTask(null);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      await deleteTask(taskId, token);
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      toast.success('Task deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting task:', err);
+      toast.error('Failed to delete task');
+    }
   };
 
   const handleEditTask = (task) => {
@@ -99,6 +138,7 @@ const HomePage = () => {
   return (
     <div>
       <Header />
+      <pre>{JSON.stringify(columns, null, 2)}</pre>
       <Banner
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -116,6 +156,7 @@ const HomePage = () => {
             tasks={tasks}
             setTasks={setTasks}
             onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
           />
           <TaskForm
             isOpen={openTaskForm}
@@ -131,6 +172,7 @@ const HomePage = () => {
             isOpen={openColumnManager}
             onClose={() => setOpenColumnManager(false)}
             columns={columns}
+            onGetAllColumns={handleGetAllColumns}
             onCreateColumn={handleCreateColumn}
             onUpdateColumn={handleUpdateColumn}
             onDeleteColumn={handleDeleteColumn}

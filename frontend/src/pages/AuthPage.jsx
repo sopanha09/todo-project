@@ -98,11 +98,6 @@ const AuthPage = () => {
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
               disabled={loading}
-              onClick={() => {
-                setTimeout(() => {
-                  navigate('/auth');
-                }, 400);
-              }}
             >
               {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Register'}
             </Button>

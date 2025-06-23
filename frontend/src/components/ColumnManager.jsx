@@ -8,11 +8,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -40,6 +40,7 @@ function ColumnManager({
   isOpen,
   onClose,
   columns,
+  onGetAllColumns,
   onCreateColumn,
   onUpdateColumn,
   onDeleteColumn,
@@ -52,31 +53,6 @@ function ColumnManager({
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
   const [columnToDelete, setColumnToDelete] = useState(null);
-
-  const handleCreateColumn = (e) => {
-    e.preventDefault();
-    if (!newColumnTitle.trim()) return;
-
-    onCreateColumn({
-      title: newColumnTitle.trim(),
-      color: newColumnColor,
-    });
-
-    setNewColumnTitle('');
-    setNewColumnColor(colorOptions[0]);
-  };
-
-  const handleUpdateColumn = (e) => {
-    e.preventDefault();
-    if (!editingColumn || !editingColumn.title.trim()) return;
-
-    onUpdateColumn(editingColumn.id, {
-      title: editingColumn.title.trim(),
-      color: editingColumn.color,
-    });
-
-    setEditingColumn(null);
-  };
 
   const handleDragStart = (e, column) => {
     setDraggedColumn(column);
@@ -128,13 +104,16 @@ function ColumnManager({
       <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Manage Columns</DialogTitle>
+          <DialogDescription>
+            Create, edit, delete, or reorder your columns.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           <Card>
             <CardContent className="p-4">
               <h3 className="font-medium mb-4">Create New Column</h3>
-              <form onSubmit={handleCreateColumn} className="space-y-4">
+              <form onSubmit={onCreateColumn} className="space-y-4">
                 <div>
                   <Label htmlFor="newTitle">Column Title</Label>
                   <Input
@@ -202,7 +181,7 @@ function ColumnManager({
                 >
                   <CardContent className="p-4">
                     {editingColumn?.id === column.id ? (
-                      <form onSubmit={handleUpdateColumn} className="space-y-4">
+                      <form onSubmit={onUpdateColumn} className="space-y-4">
                         <div>
                           <Label>Column Title</Label>
                           <Input
@@ -276,9 +255,6 @@ function ColumnManager({
                             style={{ backgroundColor: column.color }}
                           />
                           <span className="font-medium">{column.title}</span>
-                          {/* <Badge variant="outline" className="text-xs">
-                            Order: {column.order + 1}
-                          </Badge> */}
                         </div>
 
                         <div className="flex gap-2">
@@ -289,52 +265,15 @@ function ColumnManager({
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setColumnToDelete(column)}
-                                className="text-red-600 hover:text-red-700"
-                                disabled={columns.length <= 1}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Delete Column?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete{' '}
-                                  <span className="font-semibold">
-                                    {columnToDelete?.title}
-                                  </span>
-                                  ? This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel
-                                  onClick={() => setColumnToDelete(null)}
-                                >
-                                  Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-600 text-white hover:bg-red-700"
-                                  onClick={() => {
-                                    onDeleteColumn(columnToDelete.id);
-                                    setColumnToDelete(null);
-                                    toast.success(
-                                      `"${column.title}" has been removed.`
-                                    );
-                                  }}
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setColumnToDelete(column)}
+                            className="text-red-600 hover:text-red-700"
+                            disabled={columns.length <= 1}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -344,6 +283,46 @@ function ColumnManager({
             </div>
           </div>
         </div>
+
+        <AlertDialog
+          open={!!columnToDelete}
+          onOpenChange={(open) => {
+            if (!open) setColumnToDelete(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Column?</AlertDialogTitle>
+              {columnToDelete && (
+                <AlertDialogDescription>
+                  Are you sure you want to delete{' '}
+                  <span className="font-semibold">{columnToDelete.title}</span>?
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              )}
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setColumnToDelete(null)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 text-white hover:bg-red-700"
+                onClick={() => {
+                  if (columnToDelete) {
+                    onDeleteColumn(columnToDelete.id);
+                    toast.success(
+                      `"${columnToDelete.title}" has been removed.`
+                    );
+                    setColumnToDelete(null);
+                  }
+                }}
+                disabled={!columnToDelete}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <div className="flex justify-end pt-4">
           <Button onClick={onClose}>Done</Button>

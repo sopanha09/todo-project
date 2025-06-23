@@ -30,9 +30,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     await Column.insertMany([
-      { title: 'To Do', color: '#FF5733', order: 0, user_id: user._id },
-      { title: 'In Progress', color: '#33C1FF', order: 1, user_id: user._id },
-      { title: 'Done', color: '#75FF33', order: 2, user_id: user._id },
+      { title: 'To Do', color: '#FFC300', order: 0, user_id: user._id },
+      { title: 'In Progress', color: '#C70039', order: 1, user_id: user._id },
+      { title: 'Done', color: '#4f46e5', order: 2, user_id: user._id },
     ]);
     res.status(201).json({
       _id: user.id,
