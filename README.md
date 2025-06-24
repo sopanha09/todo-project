@@ -91,8 +91,63 @@ A full-stack task management application with a React + Vite frontend and an Exp
 
 ## 🗂️ Project Structure
 
-- `backend/` - Express API, MongoDB models, controllers, and routes
-- `frontend/` - React app, UI components, pages, and API service
+```
+todo-app/
+├── backend/                        # Express API backend
+│   ├── config/                     # Database connection config
+│   │   └── dbConnection.js
+│   ├── controllers/                # Route controllers (business logic)
+│   │   ├── columnController.js
+│   │   ├── taskController.js
+│   │   └── userController.js
+│   ├── middleware/                 # Express middleware (auth, error handling, etc.)
+│   │   ├── errorHandler.js
+│   │   └── validateTokenHandler.js
+│   ├── models/                     # Mongoose models (User, Task, Column)
+│   │   ├── columnModel.js
+│   │   ├── taskModel.js
+│   │   └── userModel.js
+│   ├── routes/                     # Express route definitions
+│   │   ├── columnRoutes.js
+│   │   ├── taskRoutes.js
+│   │   └── userRoutes.js
+│   ├── constants.js                # App-wide constants
+│   ├── server.js                   # Backend entry point
+│   └── .env.example                # Example environment variables
+│
+├── frontend/                       # React frontend
+│   ├── public/                     # Static assets (favicon, SVGs, etc.)
+│   │   ├── task-list.svg
+│   │   └── vite.svg
+│   ├── src/
+│   │   ├── assets/                 # Images, icons, etc.
+│   │   ├── components/             # Reusable React components
+│   │   ├── pages/                  # Page-level React components
+│   │   ├── services/               # API service functions (e.g., api.js)
+│   │   ├── index.css               # CSS/Tailwind styles
+│   │   ├── App.jsx                 # Main app component
+│   │   └── main.jsx                # React entry point
+│   ├── .env                        # Frontend environment variables
+│   ├── .env.example                # Example frontend environment variables
+│   ├── package.json                # Frontend dependencies and scripts
+│   ├── tailwind.config.js          # Tailwind CSS config
+│   ├── postcss.config.js           # PostCSS config
+│   ├── vite.config.js              # Vite config
+│   ├── jsconfig.json               # JS path aliases
+│   └── README.md                   # (Optional) Frontend-specific docs
+│
+├── .env.example                    # Example root environment variables
+├── .env                            # Root environment variables (not committed)
+├── .gitignore                      # Git ignore rules
+├── package.json                    # Root scripts and dependencies
+├── package-lock.json               # Lockfile
+└── README.md                       # Project documentation (this file)
+```
+
+- **backend/**: All server-side code (API, models, controllers, middleware, etc.)
+- **frontend/**: All client-side code (React components, pages, styles, etc.)
+- **README.md**: Project documentation and instructions
+- **.env / .env.example**: Environment variable files (never commit `.env` with secrets)
 
 ## 📜 Scripts
 
