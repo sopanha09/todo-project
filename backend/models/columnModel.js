@@ -14,7 +14,19 @@ const columnSchema = mongoose.Schema(
     },
     color: {
       type: String,
-      enum: ['#FF5733', '#33C1FF', '#75FF33', '#FFC300', '#C70039'],
+      enum: [
+        '#FFC300',
+        '#C70039',
+        '#4f46e5',
+        '#2563eb',
+        '#7c3aed',
+        '#0d9488',
+        '#059669',
+        '#ea580c',
+        '#e11d48',
+        '#475569',
+        '#6b7280',
+      ],
       default: '#FF5733',
     },
     order: {
