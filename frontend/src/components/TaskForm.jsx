@@ -16,13 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { toast } from 'react-hot-toast';
 
 function TaskForm({ isOpen, onClose, onSubmit, columns, editingTask }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    columnId: '',
+    column_id: columns[0]?.id || '',
     priority: 'medium',
     dueDate: '',
   });
@@ -32,7 +31,7 @@ function TaskForm({ isOpen, onClose, onSubmit, columns, editingTask }) {
       setFormData({
         title: editingTask.title,
         description: editingTask.description,
-        columnId: editingTask.columnId,
+        column_id: editingTask.column_id,
         priority: editingTask.priority,
         dueDate: editingTask.dueDate || '',
       });
@@ -40,7 +39,7 @@ function TaskForm({ isOpen, onClose, onSubmit, columns, editingTask }) {
       setFormData({
         title: '',
         description: '',
-        columnId: columns[0]?.id || '',
+        column_id: columns[0]?.id || '',
         priority: 'medium',
         dueDate: '',
       });
@@ -54,16 +53,10 @@ function TaskForm({ isOpen, onClose, onSubmit, columns, editingTask }) {
     onSubmit({
       title: formData.title.trim(),
       description: formData.description.trim(),
-      columnId: formData.columnId,
+      column_id: formData.column_id,
       priority: formData.priority,
       dueDate: formData.dueDate || undefined,
     });
-
-    toast.success(
-      editingTask
-        ? `"${formData.title}" has been updated successfully.`
-        : `"${formData.title}" has been created successfully.`
-    );
 
     onClose();
   };
@@ -108,8 +101,8 @@ function TaskForm({ isOpen, onClose, onSubmit, columns, editingTask }) {
             <div>
               <Label htmlFor="column">Column</Label>
               <Select
-                value={formData.columnId || columns[0]?.id}
-                onValueChange={(value) => handleChange('columnId', value)}
+                value={formData.column_id || columns[0]?.id}
+                onValueChange={(value) => handleChange('column_id', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select column" />

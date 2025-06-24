@@ -40,10 +40,10 @@ function ColumnManager({
   isOpen,
   onClose,
   columns,
-  onGetAllColumns,
   onCreateColumn,
   onUpdateColumn,
   onDeleteColumn,
+  onReorderColumns,
 }) {
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [newColumnColor, setNewColumnColor] = useState(colorOptions[0]);
@@ -53,6 +53,41 @@ function ColumnManager({
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
   const [columnToDelete, setColumnToDelete] = useState(null);
+
+  const handleCreateColumn = async (e) => {
+    e.preventDefault();
+    if (!newColumnTitle.trim()) {
+      toast.error('Column title is required.');
+      return;
+    }
+    try {
+      await onCreateColumn({
+        title: newColumnTitle.trim(),
+        color: newColumnColor,
+      });
+      setNewColumnTitle('');
+      setNewColumnColor(colorOptions[0]);
+    } catch (err) {
+      console.log('Error creating column:', err);
+    }
+  };
+
+  const handleUpdateColumn = async (e) => {
+    e.preventDefault();
+    if (!editingColumn || !editingColumn.title.trim()) {
+      toast.error('Column title is required.');
+      return;
+    }
+    try {
+      await onUpdateColumn(editingColumn.id, {
+        title: editingColumn.title.trim(),
+        color: editingColumn.color,
+      });
+      setEditingColumn(null);
+    } catch (err) {
+      console.log('Error updating column:', err);
+    }
+  };
 
   const handleDragStart = (e, column) => {
     setDraggedColumn(column);
@@ -86,8 +121,12 @@ function ColumnManager({
     newColumns.splice(targetIndex, 0, removed);
 
     newColumns.forEach((col, index) => {
+      col.order = index;
       onUpdateColumn(col.id, { order: index });
     });
+    if (onReorderColumns) {
+      onReorderColumns(newColumns);
+    }
 
     setDraggedColumn(null);
   };
@@ -113,7 +152,7 @@ function ColumnManager({
           <Card>
             <CardContent className="p-4">
               <h3 className="font-medium mb-4">Create New Column</h3>
-              <form onSubmit={onCreateColumn} className="space-y-4">
+              <form onSubmit={handleCreateColumn} className="space-y-4">
                 <div>
                   <Label htmlFor="newTitle">Column Title</Label>
                   <Input
@@ -181,7 +220,7 @@ function ColumnManager({
                 >
                   <CardContent className="p-4">
                     {editingColumn?.id === column.id ? (
-                      <form onSubmit={onUpdateColumn} className="space-y-4">
+                      <form onSubmit={handleUpdateColumn} className="space-y-4">
                         <div>
                           <Label>Column Title</Label>
                           <Input
@@ -220,15 +259,7 @@ function ColumnManager({
                         </div>
 
                         <div className="flex gap-2">
-                          <Button
-                            type="submit"
-                            size="sm"
-                            onClick={() =>
-                              toast.success(
-                                `"${column.title}" has been updated.`
-                              )
-                            }
-                          >
+                          <Button type="submit" size="sm">
                             Save
                           </Button>
                           <Button
@@ -310,9 +341,6 @@ function ColumnManager({
                 onClick={() => {
                   if (columnToDelete) {
                     onDeleteColumn(columnToDelete.id);
-                    toast.success(
-                      `"${columnToDelete.title}" has been removed.`
-                    );
                     setColumnToDelete(null);
                   }
                 }}

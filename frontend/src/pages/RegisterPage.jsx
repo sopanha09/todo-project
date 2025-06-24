@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { registerUser, loginUser } from '@/services/api';
+import { registerUser } from '@/services/api';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import toast from 'react-hot-toast';
 
-const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({
-    username: '',
-    email: '',
-    password: '',
-  });
+const RegisterPage = () => {
+  const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [timeout, setTimeout] = useState();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -26,24 +20,11 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isLogin) {
-        const res = await loginUser({
-          email: form.email,
-          password: form.password,
-        });
-        localStorage.setItem('accessToken', res.data.accessToken);
-        toast.success('Login successful!');
-        navigate('/');
-      } else {
-        await registerUser(form);
-        toast.success('Registration successful! Please log in.');
-        navigate('/');
-      }
+      await registerUser(form);
+      toast.success('Registration successful! Please log in.');
+      navigate('/auth/login');
     } catch (err) {
-      toast.error(
-        err?.response?.data?.message ||
-          (isLogin ? 'Login failed' : 'Registration failed')
-      );
+      toast.error(err?.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -54,22 +35,18 @@ const AuthPage = () => {
       <Card className="w-full max-w-sm">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-            <h2 className="text-2xl font-bold text-center mb-2">
-              {isLogin ? 'Sign In' : 'Register'}
-            </h2>
-            {!isLogin && (
-              <div>
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  value={form.username}
-                  onChange={handleChange}
-                  required
-                  autoComplete="username"
-                />
-              </div>
-            )}
+            <h2 className="text-2xl font-bold text-center mb-2">Register</h2>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                required
+                autoComplete="username"
+              />
+            </div>
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -91,7 +68,7 @@ const AuthPage = () => {
                 value={form.password}
                 onChange={handleChange}
                 required
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
+                autoComplete="new-password"
               />
             </div>
             <Button
@@ -99,18 +76,16 @@ const AuthPage = () => {
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
               disabled={loading}
             >
-              {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Register'}
+              {loading ? 'Please wait...' : 'Register'}
             </Button>
             <div className="text-center">
               <Button
                 type="button"
                 variant="link"
                 className="text-indigo-600 text-sm"
-                onClick={() => setIsLogin((prev) => !prev)}
+                onClick={() => navigate('/auth/login')}
               >
-                {isLogin
-                  ? "Don't have an account? Register"
-                  : 'Already have an account? Sign In'}
+                Already have an account? Sign In
               </Button>
             </div>
           </form>
@@ -120,4 +95,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default RegisterPage;

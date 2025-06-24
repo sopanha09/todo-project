@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Settings, Sparkles, LayoutGrid, Plus, Zap, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import TaskForm from './TaskForm';
 
 const Banner = ({
   viewMode,

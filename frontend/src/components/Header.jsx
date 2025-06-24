@@ -64,7 +64,7 @@ const Header = () => {
             toast('Signing out...');
             setTimeout(() => {
               localStorage.removeItem('accessToken');
-              navigate('/auth', { replace: true });
+              navigate('/auth/login', { replace: true });
             }, 400);
           }}
           className="flex flex-row items-center hover:text-indigo-600 justify-center gap-1 text-sm cursor-pointer hover:underline focus:underline"
@@ -77,7 +77,7 @@ const Header = () => {
           onClick={() => {
             toast('Signing in...');
             setTimeout(() => {
-              navigate('/auth', { replace: true });
+              navigate('/auth/register', { replace: true });
             }, 400);
           }}
           className="flex flex-row items-center hover:text-indigo-600 justify-center gap-1 text-sm cursor-pointer hover:underline focus:underline"
