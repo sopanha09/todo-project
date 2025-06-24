@@ -191,9 +191,6 @@ function BoardColumn({ column, tasks, onEditTask, onDeleteTask, onMoveTask }) {
               onClick={() => {
                 onDeleteTask(deleteTask.id);
                 setDeleteTask(null);
-                toast.success(
-                  `"${deleteTask.title}" has been removed success.`
-                );
               }}
             >
               Delete
@@ -205,7 +202,7 @@ function BoardColumn({ column, tasks, onEditTask, onDeleteTask, onMoveTask }) {
   );
 }
 
-function Board({ columns, tasks, setTasks, onGetAllTasks, onEditTask }) {
+function Board({ columns, tasks, setTasks, onDeleteTask, onEditTask }) {
   const sortedColumns = [...columns].sort(
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
@@ -225,10 +222,6 @@ function Board({ columns, tasks, setTasks, onGetAllTasks, onEditTask }) {
       toast.error('Failed to move task');
       // onGetAllTasks && onGetAllTasks();
     }
-  };
-
-  const onDeleteTask = (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
   return (
