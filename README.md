@@ -2,6 +2,12 @@
 
 A full-stack task management application with a React + Vite frontend and an Express + MongoDB backend.
 
+## 🎬 Demo
+
+[Watch the demo video](frontend/public/task-management-demo.mp4)
+
+![Task Management UI](frontend/public/Task%20management%20UI.jpg)
+
 ## ✨ Features
 
 - 🔐 **User Authentication**
