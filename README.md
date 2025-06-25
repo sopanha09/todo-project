@@ -35,12 +35,11 @@ A full-stack task management application with a React + Vite frontend and an Exp
 - npm or yarn
 - MongoDB instance (local or cloud)
 
-### 🛠️ Backend Setup
+### ⚡ Fullstack Setup (Recommended)
 
-1. **Install dependencies:**
+1. **Install all dependencies:**
 
    ```sh
-   cd backend
    npm install
    ```
 
@@ -53,14 +52,40 @@ A full-stack task management application with a React + Vite frontend and an Exp
      MONGO_URI=your_mongodb_uri
      ACCESS_TOKEN_SECRET=your_secret
      ```
+   - (Optional) For frontend API URL, create `frontend/.env` and set:
+     ```
+     VITE_API_URL=http://localhost:8000/api
+     ```
 
-3. **Start the backend server:**
+3. **Start both backend and frontend together:**
+
    ```sh
    npm run dev
    ```
-   The backend will run on `http://localhost:8000`.
 
-### 🖥️ Frontend Setup
+   - The backend runs on [http://localhost:8000](http://localhost:8000)
+   - The frontend runs on [http://localhost:5173](http://localhost:5173)
+
+---
+
+### 🛠️ Backend Only
+
+1. **Install dependencies:**
+
+   ```sh
+   cd backend
+   npm install
+   ```
+
+2. **Start backend:**
+
+   ```sh
+   npm run dev
+   ```
+
+---
+
+### 🖥️ Frontend Only
 
 1. **Install dependencies:**
 
@@ -69,24 +94,38 @@ A full-stack task management application with a React + Vite frontend and an Exp
    npm install
    ```
 
-2. **(Optional) Configure API URL:**
+2. **Start frontend:**
 
-   - By default, the frontend expects the backend at `http://localhost:8000/api`.
-   - To change, create a `.env` file in `frontend/` and set:
-     ```
-     VITE_API_URL=http://your-backend-url/api
-     ```
-
-3. **Start the frontend:**
    ```sh
    npm run dev
    ```
-   The frontend will run on `http://localhost:5173`.
+
+## 🛠️ Tech Stack
+
+This project uses the following technologies:
+
+- **Frontend:**
+  - [React](https://react.dev/) (with [Vite](https://vitejs.dev/) for fast development)
+  - [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
+  - [shadcn/ui](https://ui.shadcn.com/) for accessible, customizable React UI components built on top of Radix UI and Tailwind CSS
+- **Backend:**
+  - [Express.js](https://expressjs.com/) for building RESTful APIs
+  - [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/) for data modeling
+  - [JWT](https://jwt.io/) for authentication
+- **Tooling & Dev Experience:**
+  - [Nodemon](https://nodemon.io/) for backend auto-reload
+  - [Concurrently](https://www.npmjs.com/package/concurrently) to run frontend and backend together
+  - [dotenv](https://www.npmjs.com/package/dotenv) for environment variable management
+
+**UI Library:**  
+The app uses [shadcn/ui](https://ui.shadcn.com/) for a modern, accessible, and customizable component library, making it easy to build a beautiful and consistent user interface with Tailwind CSS.
+
+---
 
 ## 🧑‍💻 Usage
 
 - Open [http://localhost:5173](http://localhost:5173) in your browser.
-- Register a new account and start managing your tasks!
+- Register a new account or Login and start managing your tasks!
 - 🖱️ **Drag and drop tasks between columns on the board to update their status.**
 
 ## 🗂️ Project Structure
